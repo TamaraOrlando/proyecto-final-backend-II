@@ -122,4 +122,25 @@ router.delete("/:pid", async (req, res) => {
     }
 });
 
+
+// Ruta GET para filtrar productos por categoría.
+
+router.get('/category/:category', async (req, res) => {
+
+    const { category } = req.params;
+    
+    console.log("Categoría recibida en la ruta:", category);
+
+  
+    try {
+
+      const productos = await productManager.getProductsByCategory(category);
+      res.render('products', { productos, category });  
+
+    } catch (error) {
+      res.status(500).send("Error al obtener productos");
+    }
+
+  });
+
 export default router;

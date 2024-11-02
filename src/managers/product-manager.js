@@ -136,6 +136,20 @@ class ProductManager {
             console.log("Error al eliminar el producto", error);
         }
     }
+
+
+    async getProductsByCategory(category) {
+        try {
+
+            const products = await ProductModel.find({ category });
+            return products.map(product => product.toObject());
+            
+        } catch (error) {
+            console.error("Error al filtrar por categoría:", error);
+            throw error;
+        }
+    }
+
 }
 
 export default ProductManager;

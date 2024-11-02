@@ -65,10 +65,13 @@ router.get("/carts/:cid", async (req, res) => {
 
 
       res.render("carts", { productos: productosEnCarrito });
+
    } catch (error) {
       console.error("Error al obtener el carrito", error);
       res.status(500).json({ error: "Error interno del servidor" });
    }
 });
+
+
 
 export default router;

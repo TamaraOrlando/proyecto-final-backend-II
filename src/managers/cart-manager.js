@@ -1,5 +1,6 @@
 import CartModel from "../models/cart.model.js";
 
+
 class CartManager {
     async crearCarrito() {
         try {
@@ -10,6 +11,7 @@ class CartManager {
             console.log("Error al crear el nuevo carrito de compras.");
         }
     }
+
 
     async getCarritoById(cartId) {
         try {
@@ -25,26 +27,38 @@ class CartManager {
         }
     }
 
+
+
+
     async agregarProductoAlCarrito(cartId, productId, quantity = 1) {
         try {
-            const carrito = await this.getCarritoById(cartId);
-            const existeProducto = carrito.products.find(item => item.product.toString() === productId);
 
+            let carrito = await this.getCarritoById(cartId);
+    
+            if (!carrito) {
+                console.log(`No existe el carrito. Creando uno nuevo con ID: ${cartId}`);
+                carrito = new CartModel({ _id: cartId, products: [] });
+            }
+    
+            const existeProducto = carrito.products.find(item => item.product.toString() === productId);
             if (existeProducto) {
                 existeProducto.quantity += quantity;
             } else {
                 carrito.products.push({ product: productId, quantity });
             }
-
+    
             carrito.markModified("products");
-
             await carrito.save();
-            return carrito;
 
+            console.log(`Carrito guardado: ${carrito}`);
+            
+            return carrito;
+    
         } catch (error) {
             console.log("error al agregar un producto", error);
         }
     }
+    
 
 
 
@@ -63,6 +77,7 @@ class CartManager {
         }
     }
 
+
     async eliminarTodosLosProductosDelCarrito(cartId) {
         try {
             const carrito = await this.getCarritoById(cartId);
@@ -78,6 +93,8 @@ class CartManager {
         }
     }
 
+
+
     async actualizarCarrito(cartId, products) {
         try {
             const carrito = await this.getCarritoById(cartId);
@@ -92,6 +109,8 @@ class CartManager {
             console.log("Error al actualizar el carrito", error);
         }
     }
+
+
 
     async actualizarCantidadProducto(cartId, productId, quantity) {
         try {
