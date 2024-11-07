@@ -2,13 +2,15 @@ import CartModel from "../models/cart.model.js";
 
 
 class CartManager {
-    async crearCarrito() {
+
+    async crearCarrito(cartId = `carrito_${Date.now()}`) {
         try {
-            const nuevoCarrito = new CartModel({ products: [] });
+            const nuevoCarrito = new CartModel({ _id: cartId, products: [] });
             await nuevoCarrito.save();
             return nuevoCarrito;
         } catch (error) {
-            console.log("Error al crear el nuevo carrito de compras.");
+            console.log("Error al crear el nuevo carrito de compras.", error);
+            throw error;
         }
     }
 
@@ -34,31 +36,31 @@ class CartManager {
         try {
 
             let carrito = await this.getCarritoById(cartId);
-    
+
             if (!carrito) {
                 console.log(`No existe el carrito. Creando uno nuevo con ID: ${cartId}`);
                 carrito = new CartModel({ _id: cartId, products: [] });
             }
-    
+
             const existeProducto = carrito.products.find(item => item.product.toString() === productId);
             if (existeProducto) {
                 existeProducto.quantity += quantity;
             } else {
                 carrito.products.push({ product: productId, quantity });
             }
-    
+
             carrito.markModified("products");
             await carrito.save();
 
             console.log(`Carrito guardado: ${carrito}`);
-            
+
             return carrito;
-    
+
         } catch (error) {
             console.log("error al agregar un producto", error);
         }
     }
-    
+
 
 
 

@@ -1,5 +1,6 @@
 import express from "express";
 const router = express.Router();
+import CartModel from "../models/cart.model.js";
 import ProductManager from "../managers/product-manager.js";
 import CartManager from "../managers/cart-manager.js";
 
@@ -71,6 +72,31 @@ router.get("/carts/:cid", async (req, res) => {
       res.status(500).json({ error: "Error interno del servidor" });
    }
 });
+
+
+
+
+router.get("/carts", async (req, res) => {
+   try {
+      const carritos = await CartModel.find().populate('products.product', '_id title price');
+
+      const carritosConProductos = carritos.map(carrito => ({
+         _id: carrito._id,
+         productos: carrito.products.map(item => ({
+            product: item.product.toObject(),
+            quantity: item.quantity
+         }))
+      }));
+
+      res.render("carts", { productos: carritosConProductos });
+
+   } catch (error) {
+      console.error("Error al obtener los carritos", error);
+      res.status(500).json({ error: "Error interno del servidor" });
+   }
+});
+
+
 
 
 

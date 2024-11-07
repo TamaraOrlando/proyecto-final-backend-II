@@ -18,17 +18,19 @@ router.get("/", async (req, res) => {
 });
 
 
-// Ruta POST que crea un nuevo carrito.
 
+// Ruta POST que crea un nuevo carrito.
 router.post("/", async (req, res) => {
     try {
-        const nuevoCarrito = await cartManager.crearCarrito();
+        const cartId = req.body.cartId;
+        const nuevoCarrito = await cartManager.crearCarrito(cartId);
         res.json(nuevoCarrito);
     } catch (error) {
         console.error("Error al crear un nuevo carrito", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
 });
+
 
 
 // Ruta GET que obtiene un carrito especifico por su ID.
