@@ -16,6 +16,11 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.contenedorForm {
+    display: grid;
+    justify-content: center;
+}
+
 
 h1,
 h2,
@@ -79,6 +84,41 @@ h2 {
     transform: scale(1.1);
 }
 
+.btnn {
+    width: 100%;
+    color: white;
+    padding: 10px;
+    background-color: #383838;
+    border: #383838;
+    transition: transform 0.3s ease;
+}
+
+.btnn:hover {
+    background-color: #383838;
+    transform: scale(1.1);
+}
+
+.contenedorBtn {
+    display: grid;
+    justify-content: center;
+}
+
+.btnnn {
+    width: 100%;
+    color: white;
+    padding: 10px;
+    background-color: #282828;
+    border: #282828;
+    transition: transform 0.3s ease;
+}
+
+.btnnn:hover {
+    background-color: #282828;
+    transform: scale(1.1);
+}
+
+
+
 
 
 .contenedorPages {
@@ -93,7 +133,7 @@ h2 {
     margin-top: 1.5rem;
 }
 
-.contenedorPageDos { 
+.contenedorPageDos {
     display: flex;
     justify-content: center;
     color: #fff;

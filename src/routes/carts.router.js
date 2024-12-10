@@ -1,8 +1,10 @@
 import express from "express";
 const router = express.Router();
+import passport from "passport";
 import CartManager from "../managers/cart-manager.js";
 const cartManager = new CartManager();
 import CartModel from "../models/cart.model.js";
+import UserModel from "../models/user.model.js";
 
 
 // Ruta GET que obtiene todos los carritos.
@@ -17,19 +19,6 @@ router.get("/", async (req, res) => {
     }
 });
 
-
-
-// Ruta POST que crea un nuevo carrito.
-router.post("/", async (req, res) => {
-    try {
-        const cartId = req.body.cartId;
-        const nuevoCarrito = await cartManager.crearCarrito(cartId);
-        res.json(nuevoCarrito);
-    } catch (error) {
-        console.error("Error al crear un nuevo carrito", error);
-        res.status(500).json({ error: "Error interno del servidor" });
-    }
-});
 
 
 
@@ -53,22 +42,6 @@ router.get("/:cid", async (req, res) => {
     }
 });
 
-
-// Ruta POST agrega un producto específico a un carrito
-
-router.post("/:cid/product/:pid", async (req, res) => {
-    const cartId = req.params.cid;
-    const productId = req.params.pid;
-    const quantity = req.body.quantity || 1;
-
-    try {
-        const actualizarCarrito = await cartManager.agregarProductoAlCarrito(cartId, productId, quantity);
-        res.json(actualizarCarrito.products);
-    } catch (error) {
-        console.error("Error al agregar producto al carrito", error);
-        res.status(500).json({ error: "Error interno del servidor" });
-    }
-});
 
 
 // Ruta DELETE para eliminar todos los productos de un carrito
@@ -116,6 +89,44 @@ router.put("/:cid", async (req, res) => {
         res.status(500).json({ error: "Error interno del servidor" });
     }
 });
+
+
+
+// Ruta para manejar el carrito actual del usuario autenticado
+router.post(
+    "/current/product/:productId",
+    passport.authenticate("current", { session: false }),
+    async (req, res) => {
+      const userId = req.user._id;
+      const { productId } = req.params; 
+      const { quantity = 1 } = req.body; 
+  
+      try {
+       
+        const usuario = await UserModel.findById(userId).populate("cart");
+        if (!usuario) {
+          return res.status(404).json({ error: "Usuario no encontrado" });
+        }
+  
+        
+        const cartId = usuario.cart;
+        if (!cartId) {
+          return res.status(404).json({ error: "El usuario no tiene un carrito asociado" });
+        }
+  
+       
+        const carritoActualizado = await cartManager.agregarProductoAlCarrito(cartId, productId, quantity);
+  
+        res.json({ message: "Producto agregado al carrito", cart: carritoActualizado });
+
+      } catch (error) {
+
+        console.error("Error al agregar producto al carrito:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+        
+      }
+    }
+  );
 
 
 

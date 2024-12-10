@@ -3,16 +3,17 @@ import CartModel from "../models/cart.model.js";
 
 class CartManager {
 
-    async crearCarrito(cartId = `carrito_${Date.now()}`) {
+
+    async crearCarrito() {
         try {
-            const nuevoCarrito = new CartModel({ _id: cartId, products: [] });
-            await nuevoCarrito.save();
-            return nuevoCarrito;
+          const nuevoCarrito = new CartModel();
+          await nuevoCarrito.save();
+          return nuevoCarrito;
         } catch (error) {
-            console.log("Error al crear el nuevo carrito de compras.", error);
-            throw error;
+          console.error("Error al crear el nuevo carrito de compras.", error);
+          throw new Error("Error al crear el nuevo carrito de compras.");
         }
-    }
+      }
 
 
     async getCarritoById(cartId) {
@@ -31,37 +32,32 @@ class CartManager {
 
 
 
-
     async agregarProductoAlCarrito(cartId, productId, quantity = 1) {
         try {
-
-            let carrito = await this.getCarritoById(cartId);
-
+            const carrito = await this.getCarritoById(cartId);
             if (!carrito) {
-                console.log(`No existe el carrito. Creando uno nuevo con ID: ${cartId}`);
-                carrito = new CartModel({ _id: cartId, products: [] });
+                throw new Error("El carrito no existe");
             }
 
+            
+            productId = mongoose.Types.ObjectId(productId);
+    
             const existeProducto = carrito.products.find(item => item.product.toString() === productId);
             if (existeProducto) {
                 existeProducto.quantity += quantity;
             } else {
                 carrito.products.push({ product: productId, quantity });
             }
-
+    
             carrito.markModified("products");
             await carrito.save();
-
-            console.log(`Carrito guardado: ${carrito}`);
-
             return carrito;
-
         } catch (error) {
-            console.log("error al agregar un producto", error);
+            console.log("Error al agregar un producto al carrito:", error);
+            throw error;
         }
     }
-
-
+    
 
 
     async eliminarProductoDelCarrito(cartId, productId) {
@@ -111,7 +107,6 @@ class CartManager {
             console.log("Error al actualizar el carrito", error);
         }
     }
-
 
 
     async actualizarCantidadProducto(cartId, productId, quantity) {
