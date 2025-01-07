@@ -1,20 +1,65 @@
-async function agregarAlCarrito(productId) {
-    try {
-        const response = await fetch(`/api/carts/current/product/${productId}`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ quantity: 1 }),
+const socket = io('http://localhost:8080'); 
+
+socket.on("connect", () => {
+
+    console.log("Conectado al servidor WebSocket");
+
+    socket.on("productos", (data) => {
+
+        console.log("Productos recibidos del servidor:", data); 
+
+        if (data && data.length > 0) {
+            renderProductos(data);  
+        } else {
+            console.log("No se recibieron productos válidos.");
+        }
+    })
+
+    const renderProductos = (productos) => {
+        const contenedorProductos = document.getElementById("contenedorProductos");
+        contenedorProductos.innerHTML = "";
+
+        productos.forEach(item => {
+            const card = document.createElement("div");
+            card.classList.add("productCard");
+
+            const productId = item._id.toString();
+
+            card.innerHTML =
+                `
+            <p class="textCard"> ${item.title} </p>
+            <p class="textCard"> $${item.price} </p>
+            <button class="deleteBtn" data-id="${productId}"> Eliminar </button>
+        `
+
+            contenedorProductos.appendChild(card);
+
         });
 
-        if (!response.ok) {
-            throw new Error("Error al agregar el producto al carrito");
-        }
+        document.querySelectorAll(".deleteBtn").forEach(button => {
+            button.addEventListener("click", (e) => {
+                const productId = e.target.getAttribute("data-id");
+                socket.emit("deleteProduct", productId);
+            });
+        });
+    };
 
-        const carritoActualizado = await response.json();
-        console.log("Carrito actualizado:", carritoActualizado);
-    } catch (error) {
-        console.error("Error:", error);
+
+    const formularioProducto = document.getElementById("formularioProducto");
+
+    if (formularioProducto) {
+        formularioProducto.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+
+            const newProduct = {
+                title: e.target.title.value,
+                description: e.target.description.value,
+                price: e.target.price.value
+            };
+
+            socket.emit("addProduct", newProduct);
+            e.target.reset();
+        });
     }
-}
+});

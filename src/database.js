@@ -1,7 +1,11 @@
 import mongoose from "mongoose";
+import config from "./config/config.js";
 
 
-mongoose.connect("mongodb+srv://tamilyn07:backend@cluster0.xzfsg.mongodb.net/Backend-I?retryWrites=true&w=majority&appName=Cluster0")
+const MONGO_URL = config.MONGO_URL;
+
+
+mongoose.connect(MONGO_URL)
     .then(() => {
         console.log("Conectado a MongoDB")
     })
