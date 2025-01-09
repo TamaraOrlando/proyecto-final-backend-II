@@ -18,7 +18,7 @@ class ViewsController {
                 limit: parseInt(limit),
                 page: parseInt(page),
                 sort,
-                query: category, 
+                query: category,
             };
 
             console.log("Filters:", filters);
@@ -26,8 +26,24 @@ class ViewsController {
             const products = await ProductService.getAllProducts(filters);
             console.log("Products obtenidos:", products);
 
+            const user = req.user;
+            console.log("User data:", req.user); 
+
+           
+        if (!user || !user.cart) {
+            console.log("No se encontró el cartId en el usuario:", user);
+            return res.status(400).send("Cart ID no disponible en el usuario.");
+        }
+
+
+            const cartId = user.cart;
+            console.log("Pasando cartId a la vista:", cartId);
+
+
+
             res.render('products', {
-                productos: products.docs, 
+                productos: products.docs,
+                cartId: req.user.cart,
                 hasPrevPage: products.hasPrevPage,
                 hasNextPage: products.hasNextPage,
                 prevPage: products.prevPage,
@@ -55,8 +71,8 @@ class ViewsController {
     //vista para purchase:
     async purchaseView(req, res) {
 
-        let purchaseComplete = []  
-        let purchaseError = [] 
+        let purchaseComplete = []
+        let purchaseError = []
         let precioTotal = 0
 
         console.log('User in request:', req.user);
@@ -70,7 +86,7 @@ class ViewsController {
                 throw new Error('Usuario no encontrado');
             }
 
-            const cartId = findUser.cart;  
+            const cartId = findUser.cart;
 
             const cart = await CartService.getCartById(cartId)
 
@@ -88,17 +104,17 @@ class ViewsController {
                 const productInDB = await ProductService.getProductById(idproduct)
                 console.log('Product in DB:', productInDB);
 
-                if (quantity > productInDB.stock) {  
-                    purchaseError.push(product);  
+                if (quantity > productInDB.stock) {
+                    purchaseError.push(product);
 
                 }
 
                 if (quantity <= productInDB.stock) {
                     let productUpdate = productInDB;
                     const quantityUpdate = productInDB.stock - quantity;
-                    productUpdate.stock = quantityUpdate; 
-                    const update = await ProductService.updateProduct(idproduct, productUpdate) 
-                    purchaseComplete.push(product); 
+                    productUpdate.stock = quantityUpdate;
+                    const update = await ProductService.updateProduct(idproduct, productUpdate)
+                    purchaseComplete.push(product);
                     const monto = productInDB.price * quantity
                     precioTotal = precioTotal + monto
 
@@ -125,20 +141,37 @@ class ViewsController {
                 // Renderizamos la vista 'purchase' con los datos de la compra:
                 console.log('Purchase data:', purchaseData);
 
-                res.status(200).render('purchase', { status: 'success', payload: purchaseData, cartId });
+                res.status(200).render('purchase', {
+                    status: 'success',
+                    payload: purchaseData,
+                    cartId
+                });
+
+
             } else {
-                res.status(200).send('errorPurchase', { status: 'success', message: 'No se procesaron productos, por falta de stock.', productosNoProcesados: purchaseError });
+                res.status(200).json({
+                    status: 'error',
+                    message: 'No se procesaron productos, por falta de stock.',
+                    productosNoProcesados: purchaseError
+                });
+
             }
 
         } catch (error) {
 
-            res.status(400).send({ error: error.message });
+            console.error("Error:", error);
+            res.status(400).render('error', {
+                status: 'error',
+                message: error.message
+            });
+
+
         }
 
     }
 
     async getCart(req, res) {
-       
+
         const cartId = req.params.cid;
 
         try {
@@ -166,10 +199,10 @@ class ViewsController {
 
     async getProductsByCategory(req, res) {
         try {
-            const { category } = req.params; 
-            const productos = await ProductService.getProductsByCategory(category); 
+            const { category } = req.params;
+            const productos = await ProductService.getProductsByCategory(category);
 
-           
+
             const plainProducts = productos.map(product => product.toObject());
 
             if (!plainProducts || plainProducts.length === 0) {
@@ -177,7 +210,7 @@ class ViewsController {
             }
 
             console.log({ plainProducts, category });
-            res.render("products", { productos: plainProducts, category }); 
+            res.render("products", { productos: plainProducts, category });
 
         } catch (error) {
             console.error("Error obteniendo productos por categoría:", error);
@@ -193,13 +226,13 @@ class ViewsController {
             const user = req.user;
             const userAdmin = user.role === 'admin'
             const userObject = await UserRepository.getUserById(user._id);
-            
+
             res.render('realTimeProducts', { listaProductos, user, userAdmin });
         } catch (error) {
             console.error(error);
             res.status(500).send({ error: error.message });
         }
-}
+    }
 }
 
 export default new ViewsController();

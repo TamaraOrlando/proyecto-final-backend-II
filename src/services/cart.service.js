@@ -42,6 +42,18 @@ class CartService {
         }
     }
 
+
+        async addProductToCart(cid, pid) {
+          if (!cid || !pid) {
+            throw new Error("Cart ID y Product ID son obligatorios");
+          }
+      
+          const updatedCart = await CartRepository.addProductToCart(cid, pid);
+      
+          return updatedCart;
+        }
+      
+
 }
 
 export default new CartService();

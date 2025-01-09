@@ -1,4 +1,5 @@
 import CartService from "../services/cart.service.js";
+import ProductService from "../services/product.service.js";
 
 class CartController {
 
@@ -29,6 +30,36 @@ class CartController {
             res.status(500).json({ error: error.message });
         }
     }
+
+    
+
+    async addProduct(req, res) {
+        try {
+        
+        const cartId = req.params.cid;
+        const productId = req.params.pid;
+        const userId = req.user._id;
+
+          console.log("Cart ID:", cartId);  
+        console.log("Product ID:", productId);  
+
+        const product = await ProductService.getProductById(productId)
+        console.log("Product fetched:", product);
+
+        if (!product) {
+            return res.status(404).json({ error: "Producto no encontrado" });
+          }
+    
+    
+          const updatedCart = await CartService.addProductToCart(cartId, productId);
+    
+          res.status(200).json(updatedCart);
+        } catch (error) {
+          res.status(500).json({ error: error.message });
+        }
+      }
+
+
 }
 
 export default new CartController();

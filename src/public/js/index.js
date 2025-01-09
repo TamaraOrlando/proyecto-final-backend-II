@@ -1,3 +1,5 @@
+// Configuracion de websocket para la ruta /realtimeproducts
+
 const socket = io('http://localhost:8080'); 
 
 socket.on("connect", () => {
@@ -63,3 +65,5 @@ socket.on("connect", () => {
         });
     }
 });
+
+

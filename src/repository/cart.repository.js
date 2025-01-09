@@ -35,6 +35,17 @@ class CartRepository {
         }
     }
 
+    async addProductToCart(cid, pid) {
+
+        try{
+            return await CartDAO.addProductToCart(cid, pid);
+
+        } catch (error) {
+
+            throw new Error("Error al agregar producto al carrito: " + error.message);
+        }
+    }
+
 }
 
 export default new CartRepository();

@@ -15,6 +15,7 @@ import viewsRouter from "./routes/views.router.js";
 import ProductService from "./services/product.service.js";
 
 
+
 const app = express();
 
 
@@ -22,7 +23,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(express.static("./src/public"));
+app.use('/static', express.static('./src/public'));
 
 
 //Passport: 
