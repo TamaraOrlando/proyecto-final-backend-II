@@ -20,7 +20,7 @@ class UserController {
                 email: nuevoUsuario.email,
                 role: nuevoUsuario.role,
                 cart: nuevoUsuario.cart,
-            }, JWT_SECRET, {expiresIn: "24h"}); 
+            }, JWT_SECRET, {expiresIn: "10h"}); 
             res.cookie("coderCookieToken", token, {maxAge: 3600000, httpOnly: true}); 
 
             res.redirect("/api/sessions/current"); 
@@ -43,7 +43,7 @@ class UserController {
                 email: user.email,
                 role: user.role,
                 cart: user.cart,
-            }, JWT_SECRET, {expiresIn: "24h"}); 
+            }, JWT_SECRET, {expiresIn: "10h"}); 
 
             res.cookie("coderCookieToken", token, {maxAge: 3600000, httpOnly: true}); 
 
@@ -69,6 +69,27 @@ class UserController {
     async logout(req, res) {
         res.clearCookie("coderCookieToken"); 
         res.redirect("/login"); 
+    }
+
+    async googleCallback(req, res) {
+
+        console.log('Google Callback User:', req.user);
+        
+        if(req.user) {
+            const token = jwt.sign({
+                user: `${req.user.first_name} ${req.user.last_name}`,
+                _id: req.user._id.toString(),
+                email: req.user.email,
+                role: req.user.role,
+                cart: req.user.cart,
+            }, JWT_SECRET, {expiresIn: "10h"}); 
+
+            res.cookie("coderCookieToken", token, {maxAge: 3600000, httpOnly: true}); 
+
+            res.redirect("/api/sessions/current"); 
+        } else {
+            res.status(500).send("Error en el servidor"); 
+        }
     }
 
 }
