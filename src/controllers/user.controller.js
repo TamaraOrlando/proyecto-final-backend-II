@@ -17,6 +17,7 @@ class UserController {
 
             const token = jwt.sign({
                 user: `${nuevoUsuario.first_name} ${nuevoUsuario.last_name}`, 
+                _id: nuevoUsuario._id.toString(),
                 email: nuevoUsuario.email,
                 role: nuevoUsuario.role,
                 cart: nuevoUsuario.cart,
