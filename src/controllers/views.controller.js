@@ -27,13 +27,13 @@ class ViewsController {
             console.log("Products obtenidos:", products);
 
             const user = req.user;
-            console.log("User data:", req.user); 
+            console.log("User data:", req.user);
 
-           
-        if (!user || !user.cart) {
-            console.log("No se encontró el cartId en el usuario:", user);
-            return res.status(400).send("Cart ID no disponible en el usuario.");
-        }
+
+            if (!user || !user.cart) {
+                console.log("No se encontró el cartId en el usuario:", user);
+                return res.status(400).send("Cart ID no disponible en el usuario.");
+            }
 
 
             const cartId = user.cart;
@@ -188,7 +188,10 @@ class ViewsController {
             }));
 
 
-            res.render("carts", { productos: productosEnCarrito });
+            res.render("carts", {
+                productos: productosEnCarrito,
+                cartId: cartId
+            });
 
         } catch (error) {
             console.error("Error al obtener el carrito", error);

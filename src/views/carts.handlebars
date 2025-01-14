@@ -2,10 +2,14 @@
 
 
 <div id="contenedorProductos" class="productGrid">
+  <p style="display: none;">Cart ID: {{cartId}}</p>
   {{#each productos}}
   <div class="productCard textCard">
     <p class="cartText">Producto: {{product.title}}</p>
     <p class="cartText">Cantidad: {{quantity}}</p>
+    <form action="/carts/{{../cartId}}/purchase" method="get">
+            <button class='btn btn-primary btn-lg'> Finalizar compra</button>
+        </form>
   </div>
   {{/each}}
 </div>
