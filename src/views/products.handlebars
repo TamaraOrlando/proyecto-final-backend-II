@@ -13,12 +13,15 @@
         <h3>{{title}}</h3>
         <p>${{price}}</p>
         <p>{{category}} </p>
-         <p>Cart ID: {{../cartId}}</p>
         
+
         <button id='addToCart' class="btn btn-primary" cart-id="{{../cartId}}" product-id="{{_id}}"> Agregar al Carrito
         </button>
+        <form action="/carts/{{../cartId}}" method="get">
+            <button class='btn btn-primary btn-lg'> Ir al carrito</button>
+        </form>
     </div>
-    
+
     {{/each}}
 
 
